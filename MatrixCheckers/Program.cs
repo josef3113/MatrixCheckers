@@ -21,6 +21,7 @@ namespace MatrixCheckers
 
             Board.MoveVessel("Ac>Bd"); // Bf>Ce
             Board.MoveVessel("Bf>Ce");
+            Board.MoveVessel("Cc>Dd");
             Board.PrintBoard();
 
             for (int i = 0; i < 4; i++)
@@ -39,33 +40,33 @@ namespace MatrixCheckers
 
     public class MatrixCheckers
     {
-        uint[,] mat;
-        byte size;
-        bool gameOn;
-        byte nowPlaying;
+        uint[,] m_Mat;
+        byte m_Size;
+        bool m_GameOn;
+        byte m_NowPlaying;
 
         public MatrixCheckers(byte i_Size = 8)
         {
-            size = i_Size;
-            mat = CreateBoard(size);
-            gameOn = true;
-            nowPlaying = 1;
+            m_Size = i_Size;
+            m_Mat = CreateBoard(m_Size);
+            m_GameOn = true;
+            m_NowPlaying = 1;
         }
 
-        private uint[,] CreateBoard(byte size)
+        private uint[,] CreateBoard(byte i_Size)
         {
-            uint[,] matBoard = new uint[size, size];
+            uint[,] matBoard = new uint[i_Size, i_Size];
 
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < i_Size; i++)
             {
-                for (int j = 0; j < size; j++)
+                for (int j = 0; j < i_Size; j++)
                 {
-                    if (i < (size / 2 - 1) && (i + j) % 2 == 0)
+                    if (i < (i_Size / 2 - 1) && (i + j) % 2 == 0)
                     {
                         matBoard[i, j] = 1;
                     }
 
-                    if (i >= (size / 2 + 1) && (i + j) % 2 == 0)
+                    if (i >= (i_Size / 2 + 1) && (i + j) % 2 == 0)
                     {
                         matBoard[i, j] = 2;
                     }
@@ -79,17 +80,17 @@ namespace MatrixCheckers
         {
             Console.WriteLine();
             Console.Write(" ");
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < m_Size; i++)
             {
                 Console.Write(" {0}", (char)('A' + i));
             }
             Console.WriteLine();
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < m_Size; i++)
             {
                 Console.Write("{0} ", (char)('a' + i));
-                for (int j = 0; j < size; j++)
+                for (int j = 0; j < m_Size; j++)
                 {
-                    Console.Write("{0} ", mat[i, j]);
+                    Console.Write("{0} ", m_Mat[i, j]);
                 }
 
                 Console.WriteLine();
@@ -99,45 +100,50 @@ namespace MatrixCheckers
 
         void changePlayer()
         {
-            nowPlaying = nowPlaying == 1 ? (byte) 2 : (byte) 1;
+            m_NowPlaying = m_NowPlaying == 1 ? (byte)2 : (byte)1;
         }
 
-        public void MoveVessel(string movePos)
+        public void MoveVessel(string i_MovePos)
         {
-            
-            if (movePos[2] != '>')
+
+            if (i_MovePos[2] != '>')
             {
                 return;
             }
 
-            short vesselOneX = (short)(movePos[0] - 'A'), vesselOneY = (short)(movePos[1] - 'a')
-                , vesselTwoX = (short)(movePos[3] - 'A'), vesselTwoY = (short)(movePos[4] - 'a');
+            short vesselOneX = (short)(i_MovePos[0] - 'A'), vesselOneY = (short)(i_MovePos[1] - 'a')
+                , vesselTwoX = (short)(i_MovePos[3] - 'A'), vesselTwoY = (short)(i_MovePos[4] - 'a');
 
-            if (mat[vesselOneY, vesselOneX] == nowPlaying) // if you pick the right vessel of your team.
+            if (m_Mat[vesselOneY, vesselOneX] == m_NowPlaying) // if you pick the right vessel of your team.
             {
-                short distLineY = (short) (vesselOneY - vesselTwoY);
+                short distLineY = (short)(vesselOneY - vesselTwoY);
 
-                bool goFront = false;
+                bool goFront = isMoveFront(distLineY);
 
-                if (nowPlaying == 1)
-                {
-                    goFront = vesselOneY - vesselTwoY < 0 ? true : false ;
-                }
-                else
-                {
-                    goFront = vesselOneY - vesselTwoY < 0 ? false : true ;
-                }
-                    
-
-                if (Math.Abs(vesselOneX - vesselTwoX) == 1 && Math.Abs(vesselOneY - vesselTwoY) == 1 && goFront == true ) 
-                    // if you go only one move in cross. && the right vessel go front and not to the back.
+                if (Math.Abs(vesselOneX - vesselTwoX) == 1 && Math.Abs(vesselOneY - vesselTwoY) == 1 && goFront == true)
+                // if you go only one move in cross. && the right vessel go front and not to the back.
                 { // need to back apart later becuase will be kings and they allowd to go back or front.
 
-                    if (mat[vesselTwoY, vesselTwoX] == 0)
+                    if (m_Mat[vesselTwoY, vesselTwoX] == 0)
                     {
-                        mat[vesselTwoY, vesselTwoX] = nowPlaying;
+                        m_Mat[vesselTwoY, vesselTwoX] = m_NowPlaying;
                         changePlayer();
-                        mat[vesselOneY, vesselOneX] = 0;
+                        m_Mat[vesselOneY, vesselOneX] = 0;
+                    }
+
+                }
+
+                if (Math.Abs(vesselOneX - vesselTwoX) == 2 && Math.Abs(vesselOneY - vesselTwoY) == 2 && goFront == true)
+                {// eat / beat vessel of the enemy.
+
+                    short middleIndexX = (short)((vesselTwoX + vesselOneX) / 2), middleIndexY = (short)((vesselOneY + vesselTwoY) / 2);
+
+                    if (m_Mat[vesselTwoY, vesselTwoX] == 0 && m_Mat[middleIndexY, middleIndexX] != m_NowPlaying)
+                    {
+                        m_Mat[vesselTwoY, vesselTwoX] = m_NowPlaying;
+                        m_Mat[middleIndexY, middleIndexX] = 0; ////
+                        m_Mat[vesselOneY, vesselOneX] = 0;
+                        changePlayer();
                     }
 
                 }
@@ -146,8 +152,8 @@ namespace MatrixCheckers
 
         bool isMoveFront(short i_DistLineY) // checking if it is go front.!
         {
-           
-            if (nowPlaying != 1)
+
+            if (m_NowPlaying != 1)
             {
                 i_DistLineY *= -1;
             }
@@ -164,7 +170,7 @@ namespace MatrixCheckers
 
         //}
 
-        bool GameOn() { return gameOn; }
+        bool GameOn() { return m_GameOn; }
 
     };
 
