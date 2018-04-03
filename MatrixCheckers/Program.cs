@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace MatrixCheckers
 {
@@ -10,50 +11,66 @@ namespace MatrixCheckers
 
             Playing();
 
-            Console.ReadLine();
+            // Console.ReadLine();
         }
 
         public static void Playing()
         {
 
             MatrixCheckers Board = new MatrixCheckers(8);
+            // Board.PrintBoard();
+
+            Board.PlayingVessel("Ac>Bd"); // Bf>Ce
+            Board.PlayingVessel("Bf>Ce");
+            Board.PlayingVessel("Cc>Dd");
+            Board.PlayingVessel("Hf>Ge");
+            Board.PlayingVessel("Dd>Ee");
+            Board.PlayingVessel("Df>Fd");
+            Board.PlayingVessel("Ec>Dd");
+            Board.PlayingVessel("Fd>Ec");
+            Board.PlayingVessel("Bb>Cc");
+            //Board.PlayingVessel("Ce>Ec"); // didnt work and it is Good!!!
+            Board.PlayingVessel("Ce>Ac");
+            Board.PlayingVessel("Ca>Bb");
+            //Board.PlayingVessel("Ac>Ca"); // should become to King by number 1King(3), 2King(4)
+            //Board.PlayingVessel(""); 
+            //Board.PlayingVessel("");
+            //Board.PlayingVessel("");
+            //Board.PlayingVessel("");
+            //Board.PlayingVessel("");
+            //Board.PlayingVessel("");
+
             Board.PrintBoard();
 
-            Board.MoveVessel("Ac>Bd"); // Bf>Ce
-            Board.MoveVessel("Bf>Ce");
-            Board.MoveVessel("Cc>Dd");
-            Board.PrintBoard();
-
-            for (int i = 0; i < 4; i++)
+            string str = Console.ReadLine();
+            while (char.ToUpper(str[0]) != 'Q')
             {
-                string str = Console.ReadLine();
-                Board.MoveVessel(str);
+                Board.PlayingVessel(str);
                 Board.PrintBoard();
+                str = Console.ReadLine();
             }
 
-
         }
-
 
     }
 
 
     public class MatrixCheckers
     {
-        uint[,] m_Mat;
-        byte m_Size;
-        bool m_GameOn;
-        byte m_NowPlaying;
+        private uint[,] m_Mat;
+        private byte m_Size;
+        private bool m_GameOn;
+        private byte m_NowPlaying;
 
         public MatrixCheckers(byte i_Size = 8)
         {
             m_Size = i_Size;
-            m_Mat = CreateBoard(m_Size);
+            m_Mat = createBoard(m_Size);
             m_GameOn = true;
             m_NowPlaying = 1;
         }
 
-        private uint[,] CreateBoard(byte i_Size)
+        private uint[,] createBoard(byte i_Size)
         {
             uint[,] matBoard = new uint[i_Size, i_Size];
 
@@ -96,14 +113,21 @@ namespace MatrixCheckers
                 Console.WriteLine();
             }
 
+            StringBuilder buttomLines = new StringBuilder(m_Size * 2 + 20);
+
+            buttomLines.Append('=', m_Size + 2);
+            buttomLines.AppendFormat("{0}Playing now -> {1}{0}", Environment.NewLine, m_NowPlaying);
+            buttomLines.Append('-', m_Size + 2);
+
+            Console.WriteLine(buttomLines);
         }
 
-        void changePlayer()
+        private void changePlayer()
         {
             m_NowPlaying = m_NowPlaying == 1 ? (byte)2 : (byte)1;
         }
 
-        public void MoveVessel(string i_MovePos)
+        public void PlayingVessel(string i_MovePos) // maybe change to PlayingTurn .
         {
 
             if (i_MovePos[2] != '>')
@@ -111,46 +135,86 @@ namespace MatrixCheckers
                 return;
             }
 
-            short vesselOneX = (short)(i_MovePos[0] - 'A'), vesselOneY = (short)(i_MovePos[1] - 'a')
-                , vesselTwoX = (short)(i_MovePos[3] - 'A'), vesselTwoY = (short)(i_MovePos[4] - 'a');
+            sbyte vesselOneX, vesselOneY, vesselTwoX, vesselTwoY;
+            charsToIndex(out vesselOneX, i_MovePos[0], out vesselOneY, i_MovePos[1]);
+            charsToIndex(out vesselTwoX, i_MovePos[3], out vesselTwoY, i_MovePos[4]);
 
-            if (m_Mat[vesselOneY, vesselOneX] == m_NowPlaying) // if you pick the right vessel of your team.
+            if (m_Mat[vesselOneY, vesselOneX] != 0 && m_Mat[vesselOneY, vesselOneX] % 2 == m_NowPlaying % 2)
+            // the weird -if- is for to know that im on vessel and not empty, and then to know if the vessel is my team. (odd team -1,3-) , (even team -2,4-) .
+            // if you pick the right vessel of your team. // Check if i dont out of indexes range!!
             {
-                short distLineY = (short)(vesselOneY - vesselTwoY);
 
-                bool goFront = isMoveFront(distLineY);
+                bool goFront = true;
 
-                if (Math.Abs(vesselOneX - vesselTwoX) == 1 && Math.Abs(vesselOneY - vesselTwoY) == 1 && goFront == true)
-                // if you go only one move in cross. && the right vessel go front and not to the back.
-                { // need to back apart later becuase will be kings and they allowd to go back or front.
-
-                    if (m_Mat[vesselTwoY, vesselTwoX] == 0)
-                    {
-                        m_Mat[vesselTwoY, vesselTwoX] = m_NowPlaying;
-                        changePlayer();
-                        m_Mat[vesselOneY, vesselOneX] = 0;
-                    }
-
+                if (m_Mat[vesselOneY, vesselOneX] <= 3) // mean it's king of one side.!!
+                {
+                    sbyte distLineY = (sbyte)(vesselOneY - vesselTwoY);
+                    isMoveFront(distLineY);
                 }
 
-                if (Math.Abs(vesselOneX - vesselTwoX) == 2 && Math.Abs(vesselOneY - vesselTwoY) == 2 && goFront == true)
-                {// eat / beat vessel of the enemy.
+                sbyte vesselMovementLineX = (sbyte)Math.Abs(vesselOneX - vesselTwoX), vesselMovementLineY = (sbyte)Math.Abs(vesselOneY - vesselTwoY);
 
-                    short middleIndexX = (short)((vesselTwoX + vesselOneX) / 2), middleIndexY = (short)((vesselOneY + vesselTwoY) / 2);
-
-                    if (m_Mat[vesselTwoY, vesselTwoX] == 0 && m_Mat[middleIndexY, middleIndexX] != m_NowPlaying)
+                if (goFront == true)
+                {
+                    if (vesselMovementLineX == 1 && vesselMovementLineY == 1)
                     {
-                        m_Mat[vesselTwoY, vesselTwoX] = m_NowPlaying;
-                        m_Mat[middleIndexY, middleIndexX] = 0; ////
-                        m_Mat[vesselOneY, vesselOneX] = 0;
-                        changePlayer();
+                        moveVessel(vesselOneX, vesselOneY, vesselTwoX, vesselTwoY);
                     }
-
+                    else if (vesselMovementLineX == 2 && vesselMovementLineY == 2)
+                    {
+                        eatEnemyVessel(vesselOneX, vesselOneY, vesselTwoX, vesselTwoY);
+                    }
                 }
             }
         }
 
-        bool isMoveFront(short i_DistLineY) // checking if it is go front.!
+        //private kingVessel() {}
+
+        //private simpleVessel() { }
+
+        private bool moveVessel(sbyte i_IndexOfVesselOneX, sbyte i_IndexOfVesselOneY, sbyte i_IndexOfVesselTwoX, sbyte i_IndexOfVesselTwoY)
+        { //// te bool return is for check if all did appened and not need replay turn . if the bool not needed so to replace to void .
+            bool isMoved = false;
+
+            if (m_Mat[i_IndexOfVesselTwoY, i_IndexOfVesselTwoX] == 0)
+            {
+                m_Mat[i_IndexOfVesselTwoY, i_IndexOfVesselTwoX] = m_NowPlaying;
+                changePlayer();
+                m_Mat[i_IndexOfVesselOneY, i_IndexOfVesselOneX] = 0;
+
+                isMoved = true;
+            }
+
+            return isMoved;
+        }
+
+        private bool eatEnemyVessel(sbyte i_IndexOfVesselOneX, sbyte i_IndexOfVesselOneY, sbyte i_IndexOfVesselTwoX, sbyte i_IndexOfVesselTwoY)
+        { //// te bool return is for check if all did appened and not need replay turn . if the bool not needed so to replace to void .
+
+            bool isEated = false;
+
+            sbyte middleIndexX = (sbyte)((i_IndexOfVesselTwoX + i_IndexOfVesselOneX) / 2), middleIndexY = (sbyte)((i_IndexOfVesselOneY + i_IndexOfVesselTwoY) / 2);
+
+            if (m_Mat[i_IndexOfVesselTwoY, i_IndexOfVesselTwoX] == 0 && m_Mat[middleIndexY, middleIndexX] != m_NowPlaying)
+            {
+                m_Mat[i_IndexOfVesselTwoY, i_IndexOfVesselTwoX] = m_NowPlaying;
+                m_Mat[middleIndexY, middleIndexX] = 0; ////
+                m_Mat[i_IndexOfVesselOneY, i_IndexOfVesselOneX] = 0;
+                changePlayer();
+
+                isEated = true;
+            }
+
+            return isEated;
+        }
+
+        private void charsToIndex(out sbyte i_VesselIndexX, char i_CapitalLetterX, out sbyte i_VesselIndexY, char i_SmallLetterY)
+        {
+            i_VesselIndexX = (sbyte)(i_CapitalLetterX - 'A');
+            i_VesselIndexY = (sbyte)(i_SmallLetterY - 'a');
+        }
+
+        private bool isMoveFront(sbyte i_DistLineY) // checking if it is go front.!
         {
 
             if (m_NowPlaying != 1)
@@ -161,8 +225,7 @@ namespace MatrixCheckers
             return i_DistLineY < 0 ? true : false;
 
         }
-
-
+        
 
         //public bool MoveVesselCheck()
         //{
@@ -170,7 +233,7 @@ namespace MatrixCheckers
 
         //}
 
-        bool GameOn() { return m_GameOn; }
+        public bool GameOn() { return m_GameOn; }
 
     };
 
