@@ -9,9 +9,41 @@ namespace MatrixCheckers
         {
             Console.WriteLine("Hello World!");
 
-            Playing();
+            // Playing();
+
+            Playing2();
 
             // Console.ReadLine();
+        }
+
+        public static void Playing2()
+        {
+            MatrixCheckers Board = new MatrixCheckers(8);
+            Board.PlayingVessel("Ac>Bd"); // Bf>Ce
+            Board.PlayingVessel("Bf>Ce");
+            Board.PlayingVessel("Cc>Dd");
+            Board.PlayingVessel("Hf>Ge");
+            Board.PlayingVessel("Dd>Ee");
+            Board.PlayingVessel("Df>Fd");
+            Board.PlayingVessel("Ec>Dd");
+            Board.PlayingVessel("Fd>Ec");
+            Board.PlayingVessel("Bb>Cc");
+
+            Board.PlayingVessel("Gg>Hf");
+            Board.PlayingVessel("Aa>Bb");
+            Board.PlayingVessel("Fh>Gg");
+
+            Board.PrintBoard();
+
+
+            string str = Console.ReadLine();
+            while (char.ToUpper(str[0]) != 'Q')
+            {
+                Board.PlayingVessel(str);
+                Board.PrintBoard();
+                str = Console.ReadLine();
+            }
+
         }
 
         public static void Playing()
@@ -35,6 +67,14 @@ namespace MatrixCheckers
             Board.PlayingVessel("Ac>Ca"); // should become to King by number 1King(3), 2King(4)
             Board.PlayingVessel("Dd>Ce");
             Board.PlayingVessel("Ca>Bb");
+            Board.PlayingVessel("Ce>Bf");
+            Board.PlayingVessel("Ff>Ee");
+            Board.PlayingVessel("Cc>Bd");
+            Board.PlayingVessel("Ag>Ce");
+            Board.PlayingVessel("Ce>Ac");
+            Board.PlayingVessel("Db>Fd");
+            //Board.PlayingVessel("");
+            //Board.PlayingVessel("");
             // -- from  here to
             //Board.PlayingVessel("Db>Fd");
             //Board.PlayingVessel("Cg>Df");
@@ -42,13 +82,18 @@ namespace MatrixCheckers
             //Board.PlayingVessel("Bb>Ac");
             //Board.PlayingVessel("Gc>Hd");
             //Board.PlayingVessel("Ff>Dd");
-            // -- to here its just to see if all work back and front eating.
+            // -- to here its just to see if all work back and front eating.            
+            //Board.PlayingVessel("");
+            //Board.PlayingVessel("");
+            //Board.PlayingVessel("");
+            //Board.PlayingVessel("");
+            //Board.PlayingVessel("");
             //Board.PlayingVessel("");
             //Board.PlayingVessel("");
             //Board.PlayingVessel("");
             //Board.PlayingVessel("");
 
-            Board.PrintBoard();
+            //Board.PrintBoard();
 
             string str = Console.ReadLine();
             while (char.ToUpper(str[0]) != 'Q')
@@ -186,7 +231,7 @@ namespace MatrixCheckers
             if (isMoveFront(distLineY) == true)
             {
                 eatOrMoveVessel(vesselOneX, vesselOneY, vesselTwoX, vesselTwoY);
-                checkIfBecomeKing(ref m_Mat[vesselTwoY, vesselTwoX], vesselTwoY);
+
             }
             else
             {
@@ -213,26 +258,24 @@ namespace MatrixCheckers
 
         private void checkIfBecomeKing(ref byte io_Vessel, sbyte i_LineY)
         {
-
-            if (io_Vessel == (byte)eCheckers.CheckerO)
+            if (i_LineY == 0 || i_LineY == (m_Size - 1))
             {
-                io_Vessel = i_LineY == (m_Size - 1) ? (byte)eCheckers.CheckerU : io_Vessel;
+                if (io_Vessel == (byte)eCheckers.CheckerO || io_Vessel == (byte)eCheckers.CheckerX)
+                {
+                    io_Vessel = m_NowPlaying == k_Player1 ? (byte)eCheckers.CheckerU : (byte)eCheckers.CheckerK;
+                }
             }
-            else if (io_Vessel == (byte)eCheckers.CheckerX)
-            {
-                io_Vessel = i_LineY == 0 ? (byte)eCheckers.CheckerK : io_Vessel;
-            }
-
         }
 
         private bool moveVessel(sbyte i_IndexOfVesselOneX, sbyte i_IndexOfVesselOneY, sbyte i_IndexOfVesselTwoX, sbyte i_IndexOfVesselTwoY)
         { //// te bool return is for check if all did appened and not need replay turn . if the bool not needed so to replace to void .
             bool isMoved = false;
 
-            if (m_Mat[i_IndexOfVesselTwoY, i_IndexOfVesselTwoX] == 0)
+            if (m_Mat[i_IndexOfVesselTwoY, i_IndexOfVesselTwoX] == (byte)eCheckers.Non)
             {
                 m_Mat[i_IndexOfVesselTwoY, i_IndexOfVesselTwoX] = m_Mat[i_IndexOfVesselOneY, i_IndexOfVesselOneX];
-                m_Mat[i_IndexOfVesselOneY, i_IndexOfVesselOneX] = 0;
+                m_Mat[i_IndexOfVesselOneY, i_IndexOfVesselOneX] = (byte)eCheckers.Non; // (byte) eCheckers.Non == 0
+                checkIfBecomeKing(ref m_Mat[i_IndexOfVesselTwoY, i_IndexOfVesselTwoX], i_IndexOfVesselTwoY);
                 changePlayer();
 
                 isMoved = true;
@@ -245,8 +288,10 @@ namespace MatrixCheckers
         { //// te bool return is for check if all did appened and not need replay turn . if the bool not needed so to replace to void .
 
             bool isEated = false;
+            Console.WriteLine("Here You in Eat Method");
+            sbyte middleIndexX = (sbyte)((i_IndexOfVesselTwoX + i_IndexOfVesselOneX) / 2);
+            sbyte middleIndexY = (sbyte)((i_IndexOfVesselOneY + i_IndexOfVesselTwoY) / 2);
 
-            sbyte middleIndexX = (sbyte)((i_IndexOfVesselTwoX + i_IndexOfVesselOneX) / 2), middleIndexY = (sbyte)((i_IndexOfVesselOneY + i_IndexOfVesselTwoY) / 2);
 
             eCheckers checkers = (eCheckers)m_Mat[middleIndexY, middleIndexX];
             eCheckers enemySoilders = soilderKind(), freeSpot = (eCheckers)m_Mat[i_IndexOfVesselTwoY, i_IndexOfVesselTwoX];
@@ -254,9 +299,9 @@ namespace MatrixCheckers
             if (freeSpot == eCheckers.Non && ((checkers & enemySoilders) != checkers && checkers != eCheckers.Non))
             {
                 m_Mat[i_IndexOfVesselTwoY, i_IndexOfVesselTwoX] = m_Mat[i_IndexOfVesselOneY, i_IndexOfVesselOneX];
-                m_Mat[middleIndexY, middleIndexX] = 0; ////
-                m_Mat[i_IndexOfVesselOneY, i_IndexOfVesselOneX] = 0;
-
+                m_Mat[middleIndexY, middleIndexX] = (byte)eCheckers.Non; // eCheckers.Non = 0
+                m_Mat[i_IndexOfVesselOneY, i_IndexOfVesselOneX] = (byte)eCheckers.Non;
+                checkIfBecomeKing(ref m_Mat[i_IndexOfVesselTwoY, i_IndexOfVesselTwoX], i_IndexOfVesselTwoY);
                 mulitiEatingCheckAndDo(i_IndexOfVesselTwoX, i_IndexOfVesselTwoY);
 
                 changePlayer();
@@ -271,18 +316,18 @@ namespace MatrixCheckers
             return isEated;
         }
 
-        private eCheckers soilderKind()
-        {
-            return m_NowPlaying == k_Player1 ? eCheckers.CheckerO | eCheckers.CheckerU : eCheckers.CheckerX | eCheckers.CheckerK;
-        }
 
-        private void mulitiEatingCheckAndDo(sbyte i_VesselIndexX, sbyte i_VesselIndexY)
+        private bool mulitiEatingCheckAndDo(sbyte i_VesselIndexX, sbyte i_VesselIndexY)
         {
-            bool oneTimeToCheck = true;
+            // bool oneTimeToCheck = true;
 
-           // while (checkingBounderis(i_VesselIndexX, i_VesselIndexY) == true && oneTimeToCheck == true)
-            if (checkingBounderis(i_VesselIndexX, i_VesselIndexY) == true)
-                { 
+            bool isEating = false;
+
+            bool try1Z = checkingBounderis(i_VesselIndexX, i_VesselIndexY);
+
+            //while (checkingBounderis(i_VesselIndexX, i_VesselIndexY) == true && oneTimeToCheck == true)
+            if (try1Z == true)
+            {
                 if (m_NowPlaying == k_Player1)
                 {
                     Console.WriteLine("Hey im player1 and i can eat double.!!11");
@@ -292,8 +337,60 @@ namespace MatrixCheckers
                     Console.WriteLine("Hey im player2 and i can eat double.!!22");
                 }
 
-                oneTimeToCheck = false;
+                // oneTimeToCheck = eatWithSameSoilder(i_VesselIndexX, i_VesselIndexY);
+                isEating = eatWithSameSoilder(i_VesselIndexX, i_VesselIndexY);
+
             }
+
+            return isEating;
+        }
+
+        private bool eatWithSameSoilder(sbyte i_IndexOfVesselOneX, sbyte i_IndexOfVesselOneY)
+        {
+            bool isEated = false;
+            PrintBoard();
+            Console.WriteLine("Eat Again !!!");
+            string i_MovePos = Console.ReadLine();
+            if (char.ToUpper(i_MovePos[0]) == 'Q' || i_MovePos[2] != '>' || i_MovePos.Length != 5)
+            {
+                return false;
+            }
+
+            sbyte indexInput1X, indexInput1Y, indexInput2X, indexInput2Y;
+            charsToIndex(out indexInput1X, i_MovePos[0], out indexInput1Y, i_MovePos[1]);
+            charsToIndex(out indexInput2X, i_MovePos[3], out indexInput2Y, i_MovePos[4]);
+
+            sbyte vesselMovementLineX = (sbyte)Math.Abs(indexInput1X - indexInput2X), vesselMovementLineY = (sbyte)Math.Abs(indexInput1Y - indexInput2Y);
+
+            if (vesselMovementLineX == 2 && vesselMovementLineY == 2)
+            {
+
+                if (i_IndexOfVesselOneX == indexInput1X && i_IndexOfVesselOneY == indexInput1Y)
+                {
+                    sbyte middleIndexX = (sbyte)((indexInput1X + indexInput2X) / 2); // vesselMovementLineX
+                    sbyte middleIndexY = (sbyte)((indexInput1Y + indexInput2Y) / 2); // vesselMovementLineY
+
+                    eCheckers checkers = (eCheckers)m_Mat[middleIndexY, middleIndexX];
+                    eCheckers enemySoilders = soilderKind(), freeSpot = (eCheckers)m_Mat[indexInput2Y, indexInput2X];
+
+                    if (freeSpot == eCheckers.Non && ((checkers & enemySoilders) != checkers && checkers != eCheckers.Non))
+                    {
+                        m_Mat[indexInput2Y, indexInput2X] = m_Mat[indexInput1Y, indexInput1X];
+                        m_Mat[middleIndexY, middleIndexX] = (byte)eCheckers.Non; // eCheckers.Non = 0
+                        m_Mat[indexInput1Y, indexInput1X] = (byte)eCheckers.Non;
+
+                        // else if (vesselMovementLineX == 2 && vesselMovementLineY == 2) 
+                        //sbyte vesselMovementLineX = (sbyte)Math.Abs(vesselOneX - vesselTwoX), vesselMovementLineY = (sbyte)Math.Abs(vesselOneY - vesselTwoY);
+
+                        checkIfBecomeKing(ref m_Mat[indexInput2Y, indexInput2X], indexInput2Y);
+
+
+                        isEated = true;
+                    }
+                }
+            }
+
+            return isEated;
         }
 
         private bool checkingBounderis(sbyte i_VesselIndexX, sbyte i_VesselIndexY) // check that the indexes still in limit.
@@ -305,8 +402,8 @@ namespace MatrixCheckers
             bool isRightDownSpotLegal = (i_VesselIndexX + 2 <= end) && (i_VesselIndexY + 2 <= end); // !!
             bool isLeftUpSpotLegal = (i_VesselIndexX - 2 >= start) && (i_VesselIndexY - 2 >= start);
             bool isLeftDownSpotLegal = (i_VesselIndexX - 2 >= start) && (i_VesselIndexY + 2 <= end); // !!
-            
-            eCheckers enemySoilders = soilderKind() ;
+
+            eCheckers enemySoilders = soilderKind();
             bool isCanEatAgain = false;
             //((checkers & enemySoilders) != checkers && checkers != eCheckers.Non) // is to the enemy soilder .!!
 
@@ -338,15 +435,14 @@ namespace MatrixCheckers
             }
 
             return isCanEatAgain;
-        }           
-
-            // goal is yaad
-        private bool isHaveEnemyInCrossToEat(eCheckers soildersTeam , sbyte indexMiddleX , sbyte indexMiddleY , sbyte indexGoalX, sbyte indexGoalY)
-        {
-            eCheckers checker = (eCheckers) m_Mat[indexMiddleY, indexMiddleX], freeSpot = (eCheckers) m_Mat[indexGoalY, indexGoalX];
-            return (freeSpot == eCheckers.Non && ((checker & soildersTeam) != checker && checker != eCheckers.Non));
         }
 
+        // goal is yaad
+        private bool isHaveEnemyInCrossToEat(eCheckers soildersTeam, sbyte indexMiddleX, sbyte indexMiddleY, sbyte indexGoalX, sbyte indexGoalY)
+        {
+            eCheckers checker = (eCheckers)m_Mat[indexMiddleY, indexMiddleX], freeSpot = (eCheckers)m_Mat[indexGoalY, indexGoalX];
+            return (freeSpot == eCheckers.Non && ((checker & soildersTeam) != checker && checker != eCheckers.Non));
+        }
 
         private void charsToIndex(out sbyte o_VesselIndexX, char i_CapitalLetterX, out sbyte o_VesselIndexY, char i_SmallLetterY)
         {
@@ -362,6 +458,11 @@ namespace MatrixCheckers
             }
 
             return i_DistLineY < 0 ? true : false;
+        }
+
+        private eCheckers soilderKind()
+        {
+            return m_NowPlaying == k_Player1 ? eCheckers.CheckerO | eCheckers.CheckerU : eCheckers.CheckerX | eCheckers.CheckerK;
         }
 
         public bool GameOn() { return m_GameOn; }
