@@ -33,8 +33,21 @@ namespace MatrixCheckers
             Board.PlayingVessel("Aa>Bb");
             Board.PlayingVessel("Fh>Gg");
 
-            Board.PrintBoard();
 
+            //// ------- Multi eat
+            //Board.PlayingVessel("Db>Fd");
+            //Board.PlayingVessel("Ge>Ec");
+            //Board.PlayingVessel("Gc>Hd");
+            //Board.PlayingVessel("Hf>Ge");
+            //Board.PlayingVessel("Bd>Df");
+            //Board.PlayingVessel("");
+            //Board.PlayingVessel("");
+            //// ------ end.
+
+
+            Board.PrintBoard();
+            
+            
 
             string str = Console.ReadLine();
             while (char.ToUpper(str[0]) != 'Q')
@@ -317,16 +330,15 @@ namespace MatrixCheckers
         }
 
 
-        private bool mulitiEatingCheckAndDo(sbyte i_VesselIndexX, sbyte i_VesselIndexY)
+        private void mulitiEatingCheckAndDo(sbyte i_VesselIndexX, sbyte i_VesselIndexY)
         {
             // bool oneTimeToCheck = true;
 
-            bool isEating = false;
+            bool continueEating = true;
+                       
 
-            bool try1Z = checkingBounderis(i_VesselIndexX, i_VesselIndexY);
-
-            //while (checkingBounderis(i_VesselIndexX, i_VesselIndexY) == true && oneTimeToCheck == true)
-            if (try1Z == true)
+            while (checkingBounderis(i_VesselIndexX, i_VesselIndexY) == true && continueEating == true)
+           // if (try1Z == true)
             {
                 if (m_NowPlaying == k_Player1)
                 {
@@ -338,14 +350,15 @@ namespace MatrixCheckers
                 }
 
                 // oneTimeToCheck = eatWithSameSoilder(i_VesselIndexX, i_VesselIndexY);
-                isEating = eatWithSameSoilder(i_VesselIndexX, i_VesselIndexY);
+                continueEating = eatWithSameSoilder(ref i_VesselIndexX,ref i_VesselIndexY); // ref this for the new indexes!!
 
+               
             }
 
-            return isEating;
+            return ;
         }
 
-        private bool eatWithSameSoilder(sbyte i_IndexOfVesselOneX, sbyte i_IndexOfVesselOneY)
+        private bool eatWithSameSoilder(ref sbyte i_IndexOfVesselOneX,ref sbyte i_IndexOfVesselOneY)
         {
             bool isEated = false;
             PrintBoard();
@@ -384,6 +397,10 @@ namespace MatrixCheckers
 
                         checkIfBecomeKing(ref m_Mat[indexInput2Y, indexInput2X], indexInput2Y);
 
+                        i_IndexOfVesselOneX = indexInput2X;
+
+
+                        i_IndexOfVesselOneY = indexInput2Y;
 
                         isEated = true;
                     }
