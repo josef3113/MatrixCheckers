@@ -17,7 +17,6 @@ namespace MatrixCheckers
         public bool IsTurnPass { get; private set; } = false; // isTurnPass
         public bool IsEated { get; private set; } = false;
 
-
         public CheckersLogic(byte i_Size = 8)
         {
             m_Size = i_Size;

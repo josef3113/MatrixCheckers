@@ -24,9 +24,13 @@ namespace MatrixCheckers
 
         public static void Playing4()
         {
+
+
             GamePlay game = new GamePlay(8);
 
             game.StartGameToPlay();
+
+
 
 
         }

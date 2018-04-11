@@ -183,14 +183,14 @@ namespace MatrixCheckers
 
         // indexr that acces to BoardToGame [Af]
 
-        public char this[char i_Col, char i_Row]  // think about this !!
+        public char this[ char i_Row , char i_Col]  // think about this !!
 
         {
 
             get
 
             {
-
+                
                 //todo
 
                 return m_BoardOfGame[(2 * (i_Row - 'a') + 2)][(4 * (i_Col - 'A') + 3)];
