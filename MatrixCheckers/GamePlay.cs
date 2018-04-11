@@ -10,6 +10,8 @@ namespace MatrixCheckers
         CheckersLogic m_ActiveGame;
         BordToGame m_UiOfGame;
 
+
+
         public GamePlay(byte i_Size = 8)
         {
             m_ActiveGame = new CheckersLogic(i_Size);
@@ -93,9 +95,7 @@ namespace MatrixCheckers
         {
             const char emptyPlace = ' '; // check to naming 
             char yaadX = i_MoveInString[3], yaadY = i_MoveInString[4], makorX = i_MoveInString[0], makorY = i_MoveInString[1];
-            //m_uiofgame[yaady, yaadx] = m_uiofgame[makory, makorx];
-            //m_uiofgame[makory, makorx] = emptyplace;
-
+            
             m_UiOfGame[yaadY, yaadX] = m_UiOfGame[makorY, makorX];
             m_UiOfGame[makorY, makorX] = emptyPlace;
 
