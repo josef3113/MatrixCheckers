@@ -16,10 +16,33 @@ namespace MatrixCheckers
 
             // Playing3();
 
-            Playing4();
-            
+            // Playing4();
+
+            ArrayTry();
 
             // Console.ReadLine();
+        }
+
+        public static void ArrayTry()
+        {
+            byte[] ary = { 0, 1, 2, 3, 4 };
+
+            Console.WriteLine("ary -> {0},{1},{2},{3}", ary[0], ary[1], ary[2], ary[3]);
+
+            CheckArys(ary);
+
+            Console.WriteLine("ary -> {0},{1},{2},{3}", ary[0], ary[1], ary[2], ary[3]);
+
+            Console.ReadLine();
+        }
+
+        public static void CheckArys(byte[] ary)
+        {
+            ary[0] = 12;
+            ary[1] = 21;
+            ary[2] = 61;
+            ary[3] = 19;
+
         }
 
         public static void Playing4()
@@ -29,6 +52,14 @@ namespace MatrixCheckers
             GamePlay game = new GamePlay(8);
 
             game.StartGameToPlay();
+
+            // menu
+            // name P1
+            // size of board
+            // P2 or computer
+
+
+            // ctor here or something?
 
 
 

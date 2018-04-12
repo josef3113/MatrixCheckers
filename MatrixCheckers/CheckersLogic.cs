@@ -30,7 +30,7 @@ namespace MatrixCheckers
         private byte[,] createBoard(byte i_Size)
         {
             byte[,] matBoard = new byte[i_Size, i_Size];
-            
+
             for (int i = 0; i < i_Size; i++)
             {
                 for (int j = 0; j < i_Size; j++)
@@ -45,8 +45,8 @@ namespace MatrixCheckers
                         matBoard[i, j] = 2;
                     }
                 }
-            }            
-           
+            }
+
 
             return matBoard;
         }
@@ -243,7 +243,6 @@ namespace MatrixCheckers
             return isEated;
         }
 
-
         public void mulitiEatingCheckAndDo(byte i_VesselIndexX, byte i_VesselIndexY)
         {
             bool continueEating = true;
@@ -340,7 +339,7 @@ namespace MatrixCheckers
 
                     IsEated = true;
 
-                   // isEated = true;
+                    // isEated = true;
                 }
             }
 
@@ -400,6 +399,92 @@ namespace MatrixCheckers
 
             return isCanEatAgain;
         }
+
+        // MethodNew here. --==
+
+
+        public bool CanToEat(byte[] i_IndexesToPlay, byte[] i_IndexesThatLegal)
+        {
+            bool foundGoodPlace = false;
+
+            byte start = 0, end = (byte)(m_Size - 1);
+
+            byte indexX = i_IndexesToPlay[0], indexY = i_IndexesToPlay[1];
+
+            bool isRightUpSpotLegal = (indexX + 2 <= end) && (indexY - 2 >= start);
+            bool isLeftUpSpotLegal = (indexX - 2 >= start) && (indexY - 2 >= start);
+
+            if (isRightUpSpotLegal)
+            {
+                if (isHaveEnemyInCrossToEat((byte)(indexX + 1), (byte)(indexY - 1), (byte)(indexX + 2), (byte)(indexY - 2)))
+                {
+                    i_IndexesThatLegal[0] = (byte)(indexX + 2);
+                    i_IndexesThatLegal[1] = (byte)(indexY - 2);
+                    foundGoodPlace = true;
+                }
+            }
+
+            if (isRightUpSpotLegal && foundGoodPlace == false)
+            {
+                if (isHaveEnemyInCrossToEat((byte)(indexX - 1), (byte)(indexY - 1), (byte)(indexX - 2), (byte)(indexY - 2)))
+                {
+                    i_IndexesThatLegal[0] = (byte)(indexX - 2);
+                    i_IndexesThatLegal[1] = (byte)(indexY - 2);
+                    foundGoodPlace = true;
+                }
+            }           
+
+            eCheckers kings = eCheckers.CheckerK | eCheckers.CheckerU, currentSoilder = (eCheckers) m_Mat[indexY, indexX];
+            if ( foundGoodPlace == false && ((currentSoilder & kings ) == currentSoilder))
+            {
+                bool isRightDownSpotLegal = (indexX + 2 <= end) && (indexY + 2 <= end);
+                bool isLeftDownSpotLegal = (indexX - 2 >= start) && (indexY + 2 <= end);
+
+                if (isRightDownSpotLegal)
+                {
+                    if (isHaveEnemyInCrossToEat((byte)(indexX + 1), (byte)(indexY + 1), (byte)(indexX + 2), (byte)(indexY + 2)))
+                    {
+                        i_IndexesThatLegal[0] = (byte)(indexX + 2);
+                        i_IndexesThatLegal[1] = (byte)(indexY + 2);
+                        foundGoodPlace = true;
+                    }
+                }
+
+                if (isLeftDownSpotLegal && foundGoodPlace == false)
+                {
+                    if (isHaveEnemyInCrossToEat((byte)(indexX - 1), (byte)(indexY + 1), (byte)(indexX - 2), (byte)(indexY + 2)))
+                    {
+                        i_IndexesThatLegal[0] = (byte)(indexX - 2);
+                        i_IndexesThatLegal[1] = (byte)(indexY + 2);
+                        foundGoodPlace = true;
+                    }
+                }
+
+            }
+
+            return foundGoodPlace;
+        }
+
+
+        /*
+        bool CanToMoveAndClearAround(byte[] i_IndexesToPlay, out byte[] i_IndexesThatLegal)
+        {
+
+
+
+            return;
+        }
+        */
+
+        /*
+        bool CanToMove(byte[] i_IndexesToPlay, out byte[] i_IndexesThatLegal)
+        {
+
+
+
+            return;
+        }
+        */
 
         // goal is yaad
         private bool isHaveEnemyInCrossToEat(byte indexMiddleX, byte indexMiddleY, byte indexGoalX, byte indexGoalY)
