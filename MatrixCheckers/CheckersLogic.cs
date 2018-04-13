@@ -12,7 +12,7 @@ namespace MatrixCheckers
         private const bool k_Player1 = true;
         private bool m_NowPlaying;
         short playerOnePoints;
-        short playerTwoPoints; // to add when king and less when eating .
+        short playerTwoPoints; //  to add when king and less when eating .
 
         public bool IsTurnPass { get; private set; } = false; // isTurnPass
         public bool IsEated { get; private set; } = false;

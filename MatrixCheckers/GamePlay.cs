@@ -12,6 +12,8 @@ namespace MatrixCheckers
 
 
 
+
+
         public GamePlay(byte i_Size = 8)
         {
             m_ActiveGame = new CheckersLogic(i_Size);
